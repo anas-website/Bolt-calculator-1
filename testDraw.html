@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מחשבון לחישוב ברגים</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            text-align: right;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .input-container {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        .equation {
+            margin: 10px 0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        input {
+            margin: 5px;
+            padding: 5px;
+        }
+        button {
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .results {
+            direction: ltr;
+            margin-top: 20px;
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .law-result {
+            direction: ltr;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e6e6e6;
+            border-radius: 5px;
+        }
+        .equation {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 10px;
+        }
+        .highlight {
+            color: #007BFF;
+            font-weight: bold;
+        }
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 1.1em;
+        }
+        .fraction > span {
+            display: block;
+        }
+        .fraction > .denominator {
+            border-top: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>מחשבון לחישוב A</h1>
+        <p>התרשים המצורף:</p>
+        <img src="uploaded_drawing.jpeg" alt="תרשים">
+
+        <div class="equation">
+            <h3>הזן את הערכים:</h3>
+           
+             
+            <div class="input-container">
+                <label for="fk">מקדם החלקה <span>f<sub>k</sub></label>
+                <input type="number" id="fk" value="1.5">
+            </div>
+            <div class="input-container">
+                <label for="n">מספר שטחי המגע n</label>
+                <input type="number" id="n" value="1">
+            </div>
+            <div class="input-container">
+                <label for="i">מספר הברגים i</label>
+                <input type="number" id="i" value="4">
+            </div>
+            <div class="input-container">
+                <label for="mu">מקדם חיכוך  μ₀ </label>
+                <input type="number" id="mu" value="0.12">
+            </div>
+            <div class="input-container">
+                <label for="L">אורך ממרכז הכובד של הברגים L (mm) </label>
+                <input type="number" id="L" value="60">
+            </div>
+            <div class="input-container">
+                <label for="P">עומס P (N) </label>
+                <input type="number" id="P" value="6000">
+            </div>
+            <div class="input-container">
+                <label for="H">מרווח אנכי בין מרכז כובד הברגים למרכז הבורג הכי רחוק H (mm)</label>
+                <input type="number" id="H" value="20">
+            </div>
+            <div class="input-container">
+                <label for="B">מרווח אופקי בין מרכז כובד הברגים למרכז הבורג הכי רחוק B (mm)</label>
+                <input type="number" id="B" value="25">
+            </div>
+            <div class="input-container">
+                <label for="st">חוזק מתיחה <span class="denominator">σ<sub>t</sub></span></label>
+                <input type="number" id="st" value="120">
+            </div>
+            <button onclick="calculate()">חשב</button>
+        </div>
+
+        <div id="results" style="display: none;">
+            <h3>תוצאות:</h3>
+            <div id="law1" class="law-result">
+                <p><strong>1.</strong> r<sub>max</sub> = √(H² + B²)</p>
+                <p> r<sub>max</sub> = √(<span id="Hd"></span>² + <span id="Bd"></span>²)</p>
+                <p><span class="highlight" id="result1"></span></p>
+            </div>
+            <div id="law2" class="law-result">
+                <p><strong>2.</strong> Σr² = i × r<sub>max</sub>²</p>
+                <p> Σr² = <span id="nd"></span> × <span id="rmaxd"></span>²</p>
+                <p><span class="highlight" id="result2"></span></p>
+            </div>
+            <div id="law3" class="law-result">
+                <p><strong>3.</strong> Q<sub>p</sub> = <span class="fraction"><span>f<sub>k</sub> × P</span><span class="denominator">i × μ₀ × n</span></span></p>
+                <p> Q<sub>p</sub> = <span class="fraction"><span id="fkxp"></span><span class="denominator" id="nxuoxn"></span></span></p>
+                <p><span class="highlight" id="result3"></span></p>
+            </div>
+            <div id="law4" class="law-result">
+                <p><strong>4.</strong> Q<sub>Mmax</sub> = <span class="fraction"><span>f<sub>k</sub> × P × L × r<sub>max</sub></span><span class="denominator">μ₀ × n × Σr²</span></span></p>
+                <!-- <p> Q<sub>Mmax</sub> = <span class="fraction"><span>1.5 × 6000 × 100 × r<sub>max</sub></span><span class="denominator">0.12 × 1 × Σr²</span></span></p> -->
+                <p><span class="highlight" id="result4"></span></p>
+            </div>
+            <div id="law5" class="law-result">
+                <p><strong>5.</strong> Q<sub>max</sub> = Q<sub>p</sub> + Q<sub>Mmax</sub></p>
+                <p> Q<sub>max</sub> = Q<sub>p</sub> + Q<sub>Mmax</sub></p>
+                <p><span class="highlight" id="result5"></span></p>
+            </div>
+            <div id="law6" class="law-result">
+                <p><strong>6.</strong> A = <span class="fraction"><span>1.25 × Q<sub>max</sub></span><span class="denominator">σ<sub>t</sub></span></span></p>
+                <p> A = <span class="fraction"><span>1.25 × Q<sub>max</sub></span><span class="denominator">120</span></span></p>
+                <p><span class="highlight" id="result6"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function truncateToTwoDecimals(value) {
+            const strValue = value.toString();
+            const decimalIndex = strValue.indexOf(".");
+            if (decimalIndex === -1) return strValue;
+            return strValue.slice(0, decimalIndex + 3);
+        }
+
+        function calculate() {
+            const L = truncateToTwoDecimals(parseFloat(document.getElementById("L").value));
+            const fk = truncateToTwoDecimals(parseFloat(document.getElementById("fk").value));
+            const P = truncateToTwoDecimals(parseFloat(document.getElementById("P").value));
+            const mu = truncateToTwoDecimals(parseFloat(document.getElementById("mu").value));
+            const i = truncateToTwoDecimals(parseFloat(document.getElementById("i").value));
+            const n = truncateToTwoDecimals(parseFloat(document.getElementById("n").value));
+            const H = truncateToTwoDecimals(parseFloat(document.getElementById("H").value));
+            const B = truncateToTwoDecimals(parseFloat(document.getElementById("B").value));
+            const st = truncateToTwoDecimals(parseFloat(document.getElementById("st").value));
+
+
+            document.getElementById("Hd").textContent =  H;
+
+            document.getElementById("Bd").textContent =  B;
+            document.getElementById("nd").textContent =   i;
+            document.getElementById("fkxp").textContent =   fk +" x "+P;
+            document.getElementById("nxuoxn").textContent =   i +" x "+mu+" x "+ n;
+           
+           
+            const rmax = Math.sqrt(H ** 2 + B ** 2);
+            const truncatedRmax = truncateToTwoDecimals(rmax);
+            document.getElementById("result1").textContent = `r_max = ${truncatedRmax}`;
+
+            const rmaxSquared = Math.pow(truncatedRmax, 2);
+            const sumR2 = i * rmaxSquared;
+          
+            document.getElementById("rmaxd").textContent =  truncatedRmax;
+
+            document.getElementById("result2").textContent = `Σr² = ${truncateToTwoDecimals(sumR2)}`;
+
+            const Qp = (fk * P) / (i * mu * n);
+            document.getElementById("result3").textContent = `Q_p = ${truncateToTwoDecimals(Qp)}`;
+
+            const QMmax = (fk * P * L * rmax) / (mu * n * sumR2);
+            document.getElementById("result4").textContent = `Q_Mmax = ${truncateToTwoDecimals(QMmax)}`;
+
+            const Qmax = Qp + QMmax;
+            document.getElementById("result5").textContent = `Q_max = ${truncateToTwoDecimals(Qmax)}`;
+
+            const A = (1.25 * Qmax) / st;
+            document.getElementById("result6").textContent = `A = ${truncateToTwoDecimals(A)}`;
+
+            document.getElementById("results").style.display = "block";
+        }
+    </script>
+</body>
+</html>
