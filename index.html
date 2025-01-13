@@ -134,11 +134,115 @@
                 <label for="st">חוזק מתיחה <span class="denominator">σ<sub>t</sub></span></label>
                 <input type="number" id="st" value="120">
             </div>
-            <button onclick="calculate()">חשב</button>
+            <button onclick="drawShape()">חשב</button>
         </div>
 
         <div id="results" style="display: none;">
+
+
+
+
             <h3>תוצאות:</h3>
+
+<!-- start cavis -->
+
+<div>
+    <button onclick="zoomIn()">Zoom In</button>
+    <button onclick="zoomOut()">Zoom Out</button>
+    <label for="scale">Scale:</label>
+    <span id="scaleValue">1.0</span>
+</div>
+
+<canvas id="shapeCanvas" width="500" height="500"></canvas>
+
+<script>
+    let scale = 1.0;
+
+    function drawShape() {
+        calculate()
+        const L = truncateToTwoDecimals(parseFloat(document.getElementById("L").value));
+           
+            const Hdrw = truncateToTwoDecimals(parseFloat(document.getElementById("H").value));
+            const Bdrw = truncateToTwoDecimals(parseFloat(document.getElementById("B").value));
+            let len= parseFloat(L);
+         const A = 50
+        const Binp = 50
+       
+        const C =  Bdrw *2+50
+        const D = Hdrw *2+50
+        const radius = 10
+        // Get the canvas and context
+        const canvas = document.getElementById("shapeCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Apply scaling
+        ctx.save();
+        ctx.scale(scale, scale);
+
+        // Calculate center
+        const centerX = canvas.width / 2 / scale;
+        const centerY = canvas.height / 2 / scale;
+
+        // Draw the rectangle
+        const rectX = centerX - C / 2;
+        const rectY = centerY - D / 2;
+        ctx.strokeStyle = "black";
+        ctx.strokeRect(rectX, rectY, C, D);
+        console.log(L);
+        
+        ctx.strokeRect(rectX, rectY-20, (C/2) + len , D+40);
+
+        // Draw the holes
+        const holePositions = [
+            { x: rectX + A / 2, y: rectY +  Binp / 2 },
+            { x: rectX + C - A / 2, y: rectY +  Binp / 2 },
+            { x: rectX + A / 2, y: rectY + D -  Binp / 2 },
+            { x: rectX + C - A / 2, y: rectY + D - Binp / 2 }
+        ];
+
+        ctx.fillStyle = "blue";
+        holePositions.forEach(pos => {
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
+            ctx.fill();
+        });
+
+        // Draw the centerlines
+        ctx.strokeStyle = "blue";
+        ctx.beginPath();
+        ctx.moveTo(centerX, rectY);
+        ctx.lineTo(centerX, rectY + D);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(rectX, centerY);
+        ctx.lineTo(rectX + C, centerY);
+        ctx.stroke();
+
+        // Restore the context
+        ctx.restore();
+    }
+
+    function zoomIn() {
+        scale += 0.1;
+        document.getElementById("scaleValue").textContent = scale.toFixed(1);
+        drawShape();
+    }
+
+    function zoomOut() {
+        if (scale > 0.1) {
+            scale -= 0.1;
+            document.getElementById("scaleValue").textContent = scale.toFixed(1);
+            drawShape();
+        }
+    }
+</script>
+
+
+            <!-- end canves -->
             <div id="law1" class="law-result">
                 <p><strong>1.</strong> r<sub>max</sub> = √(H² + B²)</p>
                 <p> r<sub>max</sub> = √(<span id="Hd"></span>² + <span id="Bd"></span>²)</p>

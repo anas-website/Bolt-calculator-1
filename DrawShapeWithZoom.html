@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draw Shape with Zoom</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Draw a Shape</h1>
+    <form id="shapeForm">
+        <label for="A">A (Horizontal spacing between holes):</label>
+        <input type="number" id="A" required><br><br>
+
+        <label for="B">B (Vertical spacing between holes):</label>
+        <input type="number" id="B" required><br><br>
+
+        <label for="C">C (Overall width of the shape):</label>
+        <input type="number" id="C" required><br><br>
+
+        <label for="D">D (Overall height of the shape):</label>
+        <input type="number" id="D" required><br><br>
+
+        <label for="radius">Radius of holes:</label>
+        <input type="number" id="radius" required><br><br>
+
+        <button type="button" onclick="drawShape()">Draw</button>
+    </form>
+
+    <div>
+        <button onclick="zoomIn()">Zoom In</button>
+        <button onclick="zoomOut()">Zoom Out</button>
+        <label for="scale">Scale:</label>
+        <span id="scaleValue">1.0</span>
+    </div>
+
+    <canvas id="shapeCanvas" width="500" height="500"></canvas>
+
+    <script>
+        let scale = 1.0;
+
+        function drawShape() {
+            // Get user inputs
+            const A = parseFloat(document.getElementById("A").value);
+            const B = parseFloat(document.getElementById("B").value);
+            const C = parseFloat(document.getElementById("C").value);
+            const D = parseFloat(document.getElementById("D").value);
+            const radius = parseFloat(document.getElementById("radius").value);
+
+            // Get the canvas and context
+            const canvas = document.getElementById("shapeCanvas");
+            const ctx = canvas.getContext("2d");
+
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Apply scaling
+            ctx.save();
+            ctx.scale(scale, scale);
+
+            // Calculate center
+            const centerX = canvas.width / 2 / scale;
+            const centerY = canvas.height / 2 / scale;
+
+            // Draw the rectangle
+            const rectX = centerX - C / 2;
+            const rectY = centerY - D / 2;
+            ctx.strokeStyle = "green";
+            ctx.strokeRect(rectX, rectY, C, D);
+
+            // Draw the holes
+            const holePositions = [
+                { x: rectX + A / 2, y: rectY + B / 2 },
+                { x: rectX + C - A / 2, y: rectY + B / 2 },
+                { x: rectX + A / 2, y: rectY + D - B / 2 },
+                { x: rectX + C - A / 2, y: rectY + D - B / 2 }
+            ];
+
+            ctx.fillStyle = "blue";
+            holePositions.forEach(pos => {
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+
+            // Draw the centerlines
+            ctx.strokeStyle = "blue";
+            ctx.beginPath();
+            ctx.moveTo(centerX, rectY);
+            ctx.lineTo(centerX, rectY + D);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(rectX, centerY);
+            ctx.lineTo(rectX + C, centerY);
+            ctx.stroke();
+
+            // Restore the context
+            ctx.restore();
+        }
+
+        function zoomIn() {
+            scale += 0.1;
+            document.getElementById("scaleValue").textContent = scale.toFixed(1);
+            drawShape();
+        }
+
+        function zoomOut() {
+            if (scale > 0.1) {
+                scale -= 0.1;
+                document.getElementById("scaleValue").textContent = scale.toFixed(1);
+                drawShape();
+            }
+        }
+    </script>
+</body>
+</html>
